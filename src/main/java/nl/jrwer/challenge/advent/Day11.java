@@ -426,5 +426,9 @@ public class Day11 {
 			
 			return count;
 		}
+
+		@Override
+		protected void postProcess(List<Monkey> objects) {
+		}
 	}
 }

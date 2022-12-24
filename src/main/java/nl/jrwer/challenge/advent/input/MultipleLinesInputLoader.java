@@ -47,8 +47,11 @@ public abstract class MultipleLinesInputLoader<T> {
 			e.printStackTrace();
 		}
         
+        postProcess(list);
+        
         return list;
 	}
 	
+	protected abstract void postProcess(List<T> objects);
 	protected abstract T handleLines(String[] lines);
 }
