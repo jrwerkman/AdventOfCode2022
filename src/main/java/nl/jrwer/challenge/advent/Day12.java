@@ -61,6 +61,8 @@ public class Day12 {
 		map.findFastestPath();
 		
 		System.out.println("Step to highest point: " + map.steps);
+		
+		// Answer: 497
 	}
 	
 	class Map {
@@ -101,25 +103,50 @@ public class Day12 {
 			width = map[0].length;
 		}
 		
-		public void findFastestPath() {
-			findFastestPath(start);
+		public void findFastestPathOtherStartingPoint() {
+			int leastSteps = Integer.MAX_VALUE;
+			
+			for(int x=0; x<width; x++) {
+				for(int y=0; y<height; y++) {
+					if(getHeight(x, y) == 'a') {
+						System.out.print("Trying route from, " + x + "," + y + ": ");
+						visited.clear();
+						Coord c = findFastestPath(new Coord(x, y));
+						
+						if(c == null)
+							System.out.println("No route found");
+						else 
+							System.out.println("Needed steps: " + c.steps);
+						if(c != null && c.steps < leastSteps)
+							leastSteps = c.steps;
+					}
+				}
+			}
+			
+			steps = leastSteps;
 		}
 		
-		public void findFastestPath(Coord coord) {
+		public void findFastestPath() {
+			Coord c = findFastestPath(start);
+			
+			if(c != null)
+				steps = c.steps;
+		}
+		
+		public Coord findFastestPath(Coord coord) {
 			LinkedList<Coord> q = new LinkedList<>();
 			q.add(coord);
 			
 			while(!q.isEmpty()) {
 				Coord c = q.removeFirst();
 				
-				if(c.equals(end)) {
-					steps = c.steps;
-					System.out.println("reached end");
-					return;
-				}
+				if(c.equals(end))
+					return c;
 				
 				q.addAll(nextMoves(c));
 			}
+			
+			return null;
 		}
 		
 		public List<Coord> nextMoves(Coord coord) {
