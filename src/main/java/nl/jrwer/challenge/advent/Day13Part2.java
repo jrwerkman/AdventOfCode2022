@@ -77,7 +77,7 @@ class Day13Part2 extends Day13 {
 		System.out.println("Index divider packet [2]: " + index1);
 		System.out.println("Index divider packet [6]: " + index2);
 		System.out.println("Result: " + index1 * index2);
-		// Answer: ????
+		// Answer: 23751
 	}
 	
 	class InputLoader extends BasicInputLoader<ListElement>{
