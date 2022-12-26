@@ -190,23 +190,23 @@ class Day14 {
 				return nextRock(new Coord(stone.x + 1, obstacle.y - 1, 'o'));	
 		}
 		
-		public Coord inXAxis(Coord c) {
-			Coord higest = null;
+		protected Coord inXAxis(Coord c) {
+			Coord highest = null;
 			
 			for(Coord coord : coords)
 				if(coord.x == c.x && coord.y > c.y) {
-					if(higest == null)
-						higest = coord;
-					else if(higest.y > coord.y)
-						higest = coord;
+					if(highest == null)
+						highest = coord;
+					else if(highest.y > coord.y)
+						highest = coord;
 				}
 			
 //			System.out.println("highest: " + higest + "  (" + c + ")");
 			
-			return higest;
+			return highest;
 		}
 		
-		public boolean isOccupied(Coord c) {
+		protected boolean isOccupied(Coord c) {
 			return coords.contains(c);
 		}
 		
@@ -242,13 +242,13 @@ class Day14 {
 			}
 		}
 		
-		private boolean addStone(int x, int y) {
+		protected boolean addStone(int x, int y) {
 			add(x, y, 'o');
 			amount++;
 			return true;
 		}
 		
-		private void add(int x, int y, char value) {
+		protected void add(int x, int y, char value) {
 			add(new Coord(x, y, value));
 		}
 		
@@ -271,6 +271,8 @@ class Day14 {
 					yMax = c.y;
 			}
 			
+			xMin -= 3; yMin--; xMax += 2; yMax++;
+			
 			char[][] grid = new char[yMax - yMin][xMax - xMin];
 			for(int y=0; y<grid.length; y++) {
 				for(int x=0; x<grid[y].length; x++) {
@@ -283,7 +285,6 @@ class Day14 {
 						grid[y][x] = coords.get(index).value;
 					else 
 						grid[y][x] = '.';
-					
 				}
 			}
 			
@@ -310,6 +311,10 @@ class Day14 {
 			this.y = Integer.parseInt(split[1]);
 			
 			this.value = value;
+		}
+		
+		public boolean equals(int x, int y) {
+			return this.x == x && this.y == y;
 		}
 		
 		@Override
