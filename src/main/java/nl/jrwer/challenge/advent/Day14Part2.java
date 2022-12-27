@@ -62,6 +62,7 @@ class Day14Part2 extends Day14 {
 		}
 		
 		map.print();
+		// TODO optimize speed
 		System.out.println(map.amount);
 		
 		// Answer: 25055
