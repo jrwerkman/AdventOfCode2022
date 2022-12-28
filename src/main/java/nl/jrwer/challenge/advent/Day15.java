@@ -1,8 +1,7 @@
 package nl.jrwer.challenge.advent;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import nl.jrwer.challenge.advent.input.BasicInputLoader;
@@ -123,15 +122,19 @@ class Day15 {
 	public void start() {
 		List<Sensor> sensors = new InputLoader("input-day-15.txt").getInput();
 
+		long start = System.currentTimeMillis();
 		BeaconMap map = new BeaconMap(sensors);
 //		System.out.println("Occupied possition: " + map.positionNotBeacon(10));
 		System.out.println("Occupied possition: " + map.positionNotBeacon(2000000));
+		
+		long end = System.currentTimeMillis();
+		System.out.println("Solution took " + (end - start) + " ms");
 		
 		// Answer: 5112034
 	}
 	
 	class BeaconMap {
-		private List<Sensor> sensors;
+		protected List<Sensor> sensors;
 		
 		public BeaconMap(List<Sensor> sensors) {
 			this.sensors = sensors;
@@ -143,21 +146,13 @@ class Day15 {
 			for(Sensor s : sensors)
 				processSensor(result, s, y);
 
-			return calculate(result) - removeStuff(y, result);
+			return calculate(result) - removeBeacons(y, result);
 		}
-	
+		
 		private int calculate(List<Range> result) {
-			List<Range> newResult = new ArrayList<>();
-			while(optimize(newResult, result)) {
-				result = newResult;
-				newResult = new ArrayList<>();
-				
-				sort(result);
-			}
-			
 			int amount = 0;
 
-			for(Range r: newResult) {
+			for(Range r: result) {
 				amount += r.length;
 				System.out.println(r.a + "," + r.b);
 			}
@@ -165,64 +160,29 @@ class Day15 {
 			return amount;
 		}
 		
-		public boolean optimize(List<Range> newResult, List<Range> result) {
-			boolean notReady = false;
-			
-			Range range = result.get(0);
-			newResult.add(range);
-			
-			for(int i=1; i<result.size(); i++) {
-				Range compare = result.get(i);
-				List<Range> dif = new ArrayList<>();
-
-				if(range.getDifference(dif, compare))
-					notReady = true;
-
-				newResult.addAll(dif);
-				
-				range = compare;
-			}
-			
-			return notReady;
-		}
-		
-		public int removeStuff(int y, List<Range> result) {
+		private int removeBeacons(int y, List<Range> result) {
 			List<Integer> removed = new ArrayList<>();
 			
 			for(Range r : result) {
 				for(Sensor s : sensors) {
-					if(s.y == y && r.inRange(s.x)) 
-						if(!removed.contains(s.x))
-							removed.add(s.x);
-					
-					if(s.beacon.y == y && r.inRange(s.beacon.x)) 
-						if(!removed.contains(s.beacon.x))
-							removed.add(s.beacon.x);
+					removeBeacon(removed, s, r, y);
+					removeBeacon(removed, s.beacon, r, y);
 				}
 			}
 			
 			return removed.size();
 		}
 		
-		private void sort(List<Range> list) {
-			Collections.sort(list, new Comparator<Range>() {
-
-				@Override
-				public int compare(Range r1, Range r2) {
-					return r1.a - r2.a;
-				}
-			});	
+		public void removeBeacon(List<Integer> removed, Coord c, Range r, int y) {
+			if(c.y == y && r.inRange(c.x)) 
+				if(!removed.contains(c.x))
+					removed.add(c.x);
 		}
 
 		public void processSensor(List<Range> result, Sensor sensor, int y) {
 			int distanceToBeacon = sensor.getDistanceToBeacon();
 			int distanceFromSensor = Math.abs(y - sensor.y);
 			int amountToAdd = distanceToBeacon - distanceFromSensor;
-			
-//			System.out.println("Processing sensor: " + sensor.toString() + " (beacon: "+sensor.beacon.toString()+")"
-//					+ "\n - distance to beacon: " + distanceToBeacon 
-//					+ "\n - distance from sensor: " + distanceFromSensor
-//					+ "\n - amount to add: " + amountToAdd);
 			
 			if(amountToAdd > 0)
 				add(result, sensor.x, amountToAdd);
@@ -233,15 +193,29 @@ class Day15 {
 			int b = x + amountToAdd;
 			
 			Range newRange = new Range(a, b);
+
+			for (Iterator<Range> iterator = result.iterator(); iterator.hasNext();) {
+				Range range = iterator.next();
+
+				if (range.overlap(newRange)) {
+					newRange.merge(range);
+					iterator.remove();
+				}
+			}
+
 			result.add(newRange);
 		}
 	}  
 
 	class Range {
-		final int a, b;
-		final int length;
+		int a, b;
+		int length;
 		
 		public Range(int a, int b) {
+			this.set(a, b);
+		}
+		
+		private void set(int a, int b) {
 			this.a = a;
 			this.b = b;
 			
@@ -252,33 +226,16 @@ class Day15 {
 			return a <= x && b >= x;
 		}
 		
-		/**
-		 * returns true if range is new
-		 * Returns false if the list should be used instead
-		 * 
-		 * @param dif
-		 * @param range
-		 * @return
-		 */
-		public boolean getDifference(List<Range> dif, Range range) {
-			if(dif == null)
-				dif = new ArrayList<Range>();
-			
-			if(range.a >= a && range.b <= b) {
-				
-			} else if((range.b < a) || (range.a > b)) {
-				dif.add(range);
-				return false;
-			} else if(range.a < a && (range.b >= a && range.b <= b)) {
-				dif.add(new Range(range.a, a - 1));
-			} else if(range.b > b && (range.a >= a && range.a <= b)) {
-				dif.add(new Range(b + 1, range.b));
-			} else if(range.a < a && range.b > b) {
-				dif.add(new Range(range.a, a - 1));
-				dif.add(new Range(range.b, b + 1));
-			}
-			
-			return true;
+		public boolean overlap(Range range) {
+			return (range.a >= a && range.b <= b) 
+					|| (range.a < a && (range.b >= a && range.b <= b))
+					|| (range.b > b && (range.a >= a && range.a <= b))
+					|| (range.a < a && range.b > b);
+		}
+		
+		public void merge(Range range) {
+			this.set(range.a <= a ? range.a : a,
+					range.b >= b ? range.b : b);
 		}
 	}
 	
