@@ -176,7 +176,7 @@ class Day16 {
 	};
 	
 	int[] answers = new int[] {1906, 1651, 2640, 13468, 1288, 2400};
-	int[] answers2 = new int[] {0, 0, 2670, 12887, 1484, 3680};
+	int[] answers2 = new int[] {0, 1707, 2670, 12887, 1484, 3680};
 	
 	public void start() {
 		execute(input[0], answers[0]);
@@ -217,19 +217,26 @@ class Day16 {
 		final List<Valve> valves;
 		final Routes routes;
 		
-		Path start;
+		final Valve startValve;
 		
 		public Calculator(List<Valve> valves, Routes routes, Settings settings) {
 			this.settings = settings;
 			this.valves = valves;
 			this.routes = routes;
-			
+			this.startValve = getStartValve();
+		}
+		
+		private Valve getStartValve() {
 			for(Valve v : valves) 
 				if(v.name.equals("AA"))
-					this.start = new Path(settings, v);
+					return v;
+			
+			return null;
 		}
 		
 		public int maxPresureRelease() {
+			Path start = new Path(settings, startValve);
+			
 			try {
 				LinkedList<Path> q = new LinkedList<>();
 				q.add(start);
@@ -272,6 +279,7 @@ class Day16 {
 	}
 	
 	class Path {
+		final int number;
 		final Settings settings;
 		final State state;
 
@@ -279,18 +287,35 @@ class Day16 {
 		final Valve[] openedValves;
 		
 		public Path(Settings settings, Valve first) {
+			this.number = 0;
 			this.settings = settings;
-			this.state = new State(0, 0, 0);
-
 			this.currentValve = first;
 			this.openedValves = new Valve[0];
+			this.state = new State(0, 0, 0);
 		}
 		
-		private Path(Settings settings, State state, Valve currentValve, 
+		Path(Settings settings, State state, Valve currentValve, 
 				Valve[] openedValves) {
+			this.number = 0;
 			this.settings = settings;
 			this.state = state;
-			
+			this.currentValve = currentValve;
+			this.openedValves = openedValves;
+		}
+		
+		public Path(int number, Settings settings, Valve first) {
+			this.number = number;
+			this.settings = settings;
+			this.currentValve = first;
+			this.openedValves = new Valve[0];
+			this.state = new State(0, 0, 0);
+		}
+		
+		Path(int number, Settings settings, State state, Valve currentValve, 
+				Valve[] openedValves) {
+			this.number = number;
+			this.settings = settings;
+			this.state = state;
 			this.currentValve = currentValve;
 			this.openedValves = openedValves;
 		}
