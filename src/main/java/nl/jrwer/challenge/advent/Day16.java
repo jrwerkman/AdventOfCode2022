@@ -176,12 +176,13 @@ class Day16 {
 	};
 	
 	int[] answers = new int[] {1906, 1651, 2640, 13468, 1288, 2400};
-	int[] answers2 = new int[] {0, 1707, 2670, 12887, 1484, 3680};
+	int[] answers2 = new int[] {2548, 1707, 2670, 12887, 1484, 3680};
 	
 	public void start() {
-		execute(input[0], answers[0]);
+//		execute(input[0], answers[0]);
+		execute(input[1], answers[1]);
 
-//		for(int i=0; i<input.length; i++)
+//		for(int i=1; i<input.length; i++)
 //			execute(input[i], answers[i]);
 	}
 	
@@ -205,10 +206,12 @@ class Day16 {
 	class Settings {
 		final int persons;
 		final int time;
+		final int totalTime;
 		
 		public Settings(int persons, int time) {
 			this.time = time;
 			this.persons = persons;
+			this.totalTime = time * persons;
 		}
 	}
 	
@@ -242,6 +245,7 @@ class Day16 {
 				q.add(start);
 				
 				Path bestPath = start;
+				int maxQueueSize = 0;
 				
 				while(!q.isEmpty()) {
 					Path p = q.removeFirst();
@@ -251,8 +255,12 @@ class Day16 {
 
 					if(p.state.time <= settings.time)
 						q.addAll(p.nextPaths(routes));
+					
+					if(q.size() > maxQueueSize)
+						maxQueueSize = q.size();
 				}
 
+				System.out.println("Max queue size: " + maxQueueSize);
 				System.out.println(bestPath);
 				
 				return bestPath.state.flown;
@@ -267,6 +275,7 @@ class Day16 {
 	}
 	
 	class State {
+
 		final int time;
 		final int flowRate;
 		final int flown;
@@ -279,6 +288,7 @@ class Day16 {
 	}
 	
 	class Path {
+
 		final int number;
 		final Settings settings;
 		final State state;
@@ -498,6 +508,7 @@ class Day16 {
 	}	
 	
 	class Valve {
+		
 		String name;
 		int flowRate;
 		String[] tunnelsLeadTo;
