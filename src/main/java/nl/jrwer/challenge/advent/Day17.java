@@ -374,6 +374,7 @@ class Day17 {
 		final Rocks rocks = new Rocks();
 		
 		long rockCount = 0;
+		long sequenceCount = 0;
 		long top = 0;
 		
 		boolean currentRockFalling = true;
@@ -406,6 +407,7 @@ class Day17 {
 		
 		public Direction nextDirection() {
 			currentDirection = sequence.next(); 
+			sequenceCount++;
 			return currentDirection;
 		}
 	
@@ -508,7 +510,7 @@ class Day17 {
 	
 	class Rocks {
 		final Stones[] stones;
-		private int index = -1;
+		int index = -1;
 		
 		public Rocks() {
 			this.stones = new Stones[] {
@@ -702,8 +704,8 @@ class Day17 {
 	}
 	
 	class Sequence {
-		private final Direction[] sequence;
-		private int index = 0;
+		final Direction[] sequence;
+		int index = 0;
 		
 		public Sequence(String input) {
 			this.sequence = new Direction[input.length()];
