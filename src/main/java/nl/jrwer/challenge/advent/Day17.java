@@ -367,23 +367,28 @@ class Day17 {
 	}
 	
 	class Chamber {
-		final int fallingRocks = 2022;
+		final long fallingRocks;
 		final int width = 7;
-		int highest = 0;
+		long highest = 0;
 		final Rocks rocks = new Rocks();
 
 		final Sequence sequence;
-		Map<Integer, Map<Integer, Character>> chamber = new HashMap<>();
+		Map<Long, Map<Long, Character>> chamber = new HashMap<>();
 		
 		public Chamber(Sequence sequence) {
+			this(sequence, 2_022L);
+		}
+		
+		protected Chamber(Sequence sequence, long fallingRocks) {
+			this.fallingRocks = fallingRocks;
 			this.sequence = sequence;
 			
-			for(int i=0; i<width; i++)
+			for(long i=0; i<width; i++)
 				chamber.put(i, new HashMap<>());
 		}
 		
-		public int calculate() {
-			for(int i=0; i<fallingRocks; i++)
+		public long calculate() {
+			for(long i=0; i<fallingRocks; i++)
 				fall(rocks.next());
 			
 //			printHeight();
@@ -392,7 +397,7 @@ class Day17 {
 		}
 		
 		private void fall(Rock rock) {
-			int fallingHeight = getHighest() + 4;
+			long fallingHeight = getHighest() + 4;
 			boolean falling = true;
 			
 			rock.setY(fallingHeight);
@@ -442,7 +447,7 @@ class Day17 {
 		}
 		
 		public void setNewHighest(Rock rock) {
-			int highestPointNewRock = rock.getHighest().y;
+			long highestPointNewRock = rock.getHighest().y;
 			
 			if(highestPointNewRock > this.highest)
 				this.highest = rock.getHighest().y;
@@ -453,23 +458,23 @@ class Day17 {
 				set(c.x, c.y);
 		}
 		
-		public void set(int x, int y) {
+		public void set(long x, long y) {
 			chamber.get(x).put(y, '#');
 		}
 		
-		public Character get(int x, int y) {
+		public Character get(long x, long y) {
 			return chamber.get(x).getOrDefault(y, '.');
 		}
 		
-		public int getHighest() {
+		public long getHighest() {
 			return this.highest;
 		}
 		
 		public void printHeight() {
 			StringBuilder sb = new StringBuilder();
 			
-			for(int y=highest; y>0; y--) {
-				for(int x=0; x<width; x++)
+			for(long y=highest; y>0; y--) {
+				for(long x=0; x<width; x++)
 					sb.append(get(x, y));
 				
 				sb.append('\n');
@@ -581,7 +586,8 @@ class Day17 {
 
 	abstract class Rock {
 		Coord[] coords;
-		final int mostLeft, mostRight, highest;
+		final int mostLeft, mostRight;
+		int highest;
 		
 		public Rock(int mostLeft, int mostRight, int highest) {
 			this.coords = getCoords();
@@ -611,7 +617,7 @@ class Day17 {
 			return coords[mostRight];
 		}
 		
-		public void setY(int height) {
+		public void setY(long height) {
 			for(Coord c : coords)
 				c.y += height;
 		}
@@ -648,9 +654,9 @@ class Day17 {
 	}
 	
 	class Coord {
-		int x, y;
+		long x, y;
 		
-		public Coord(int x, int y) {
+		public Coord(long x, long y) {
 			this.x = x;
 			this.y = y; 
 		}
