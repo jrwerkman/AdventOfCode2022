@@ -357,125 +357,147 @@ class Day17 {
 	
 	public void start() {
 		Sequence sequence = new InputLoader("input-day-17.txt").getInput();
+		State state = new State(2_022L, sequence);
 		
 		long start = System.currentTimeMillis();
-		Chamber c = new Chamber(sequence);
+		Chamber c = new Chamber(state);
 		System.out.println(c.calculate());
 		long end = System.currentTimeMillis();
 		
 		System.out.println("Process took: " + (end - start) + " ms\n");
 	}
 	
-	class Chamber {
+	class State {
 		final long fallingRocks;
 		final int width = 7;
-		long highest = 0;
-		final Rocks rocks = new Rocks();
-
 		final Sequence sequence;
-		Map<Long, Map<Long, Character>> chamber = new HashMap<>();
+		final Rocks rocks = new Rocks();
 		
-		public Chamber(Sequence sequence) {
-			this(sequence, 2_022L);
-		}
+		long rockCount = 0;
+		long top = 0;
 		
-		protected Chamber(Sequence sequence, long fallingRocks) {
+		boolean currentRockFalling = true;
+		Rock currentRock;
+		Direction currentDirection;
+		Map<Long, Map<Long, Boolean>> chamber = new HashMap<>();
+
+		public State(long fallingRocks, Sequence sequence) {
 			this.fallingRocks = fallingRocks;
 			this.sequence = sequence;
 			
 			for(long i=0; i<width; i++)
-				chamber.put(i, new HashMap<>());
+				chamber.put(i, new HashMap<>());			
+		}
+		
+		public Rock nextRock() {
+			currentRock = rocks.next();
+			// Move rock up
+			currentRock.setY(top + 4);
+
+			rockCount++;
+			currentRockFalling = true;
+			
+			return currentRock;
+		}
+		
+		public boolean hasNextRock() {
+			return rockCount < fallingRocks;
+		}
+		
+		public Direction nextDirection() {
+			currentDirection = sequence.next(); 
+			return currentDirection;
+		}
+	
+		public void set(long x, long y) {
+			chamber.get(x).put(y, true);
+		}
+		
+		public Boolean get(long x, long y) {
+			return chamber.get(x).getOrDefault(y, false);
+		}
+		
+		public boolean canMove() {
+			Coord l = currentRock.mostLeft();
+			Coord r = currentRock.mostRight();
+			
+			if((l.x == 0 && currentDirection == Direction.LEFT) 
+					|| (r.x == width - 1 && currentDirection == Direction.RIGHT))
+				return false;
+			
+			if(currentDirection == Direction.LEFT)
+				for(Coord c : currentRock.coords)
+					if(c.x > 0 && get(c.x - 1, c.y) && currentDirection == Direction.LEFT)
+						return false;
+			
+			if(currentDirection == Direction.RIGHT)
+				for(Coord c : currentRock.coords)
+					if(c.x < width - 1 && get(c.x + 1, c.y) && currentDirection == Direction.RIGHT)
+						return false;
+			
+			return true;
+		}
+		
+		public boolean isFalling() {
+			return currentRockFalling;
+		}
+		
+		public boolean canFall() {
+			for(Coord c : currentRock.coords)
+				if(c.y <= 1 || get(c.x, c.y - 1))
+					currentRockFalling = false;
+			
+			return currentRockFalling;
+		}
+		
+		public void setTop() {
+			long highestPointNewRock = currentRock.getHighest().y;
+			
+			if(highestPointNewRock > top)
+				top = currentRock.getHighest().y;
+		}
+		
+		public void addRock() {
+			for(Coord c : currentRock.coords)
+				set(c.x, c.y);
+		}
+	}
+	
+	class Chamber {
+		final State state;
+		
+		public Chamber(State state) {
+			this.state = state;
 		}
 		
 		public long calculate() {
-			for(long i=0; i<fallingRocks; i++)
-				fall(rocks.next());
+			while(state.hasNextRock())
+				fall(state.nextRock());
 			
-//			printHeight();
-			
-			return highest;
+			return state.top;
 		}
 		
 		private void fall(Rock rock) {
-			long fallingHeight = getHighest() + 4;
-			boolean falling = true;
-			
-			rock.setY(fallingHeight);
-
-			while(falling) {
-				Direction dir = sequence.next();
-				if(canMove(rock, dir))
+			while(state.isFalling()) {
+				Direction dir = state.nextDirection();
+				
+				if(state.canMove())
 					rock.move(dir);
 				
-				if(canFall(rock)) {
+				if(state.canFall()) 
 					rock.move(Direction.DOWN);
-				} else {
-					setNewHighest(rock);
-					addRock(rock);
-					falling = false;
-				}
 			}
-		}
-
-		public boolean canMove(Rock rock, Direction dir) {
-			Coord l = rock.mostLeft();
-			Coord r = rock.mostRight();
 			
-			if((l.x == 0 && dir == Direction.LEFT) 
-					|| (r.x == width - 1 && dir == Direction.RIGHT))
-				return false;
-			
-			if(dir == Direction.LEFT)
-				for(Coord c : rock.coords)
-					if(c.x > 0 && get(c.x - 1, c.y) == '#' && dir == Direction.LEFT)
-						return false;
-			
-			if(dir == Direction.RIGHT)
-				for(Coord c : rock.coords)
-					if(c.x < width - 1 && get(c.x + 1, c.y) == '#' && dir == Direction.RIGHT)
-						return false;
-			
-			return true;
-		}
-		
-		public boolean canFall(Rock rock) {
-			for(Coord c : rock.coords)
-				if(c.y <= 1 || get(c.x, c.y - 1) == '#')
-					return false;
-			
-			return true;
-		}
-		
-		public void setNewHighest(Rock rock) {
-			long highestPointNewRock = rock.getHighest().y;
-			
-			if(highestPointNewRock > this.highest)
-				this.highest = rock.getHighest().y;
-		}
-		
-		public void addRock(Rock rock) {
-			for(Coord c : rock.coords)
-				set(c.x, c.y);
-		}
-		
-		public void set(long x, long y) {
-			chamber.get(x).put(y, '#');
-		}
-		
-		public Character get(long x, long y) {
-			return chamber.get(x).getOrDefault(y, '.');
-		}
-		
-		public long getHighest() {
-			return this.highest;
+			state.addRock();
+			state.setTop();
 		}
 		
 		public void printHeight() {
 			StringBuilder sb = new StringBuilder();
 			
-			for(long y=highest; y>0; y--) {
-				for(long x=0; x<width; x++)
-					sb.append(get(x, y));
+			for(long y=state.top; y>0; y--) {
+				for(long x=0; x<state.width; x++)
+					sb.append(state.get(x, y));
 				
 				sb.append('\n');
 			}
@@ -681,7 +703,7 @@ class Day17 {
 	
 	class Sequence {
 		private final Direction[] sequence;
-		private int index = -1;
+		private int index = 0;
 		
 		public Sequence(String input) {
 			this.sequence = new Direction[input.length()];
@@ -691,13 +713,18 @@ class Day17 {
 						Direction.LEFT : Direction.RIGHT;
 		}
 		
+		public boolean hasNext() {
+			return index < sequence.length;
+		}
+		
 		public Direction next() {
-			index++;
-			
 			if(index == sequence.length)
 				index = 0;
+
+			Direction dir = sequence[index];
+			index++;
 			
-			return sequence[index];
+			return dir;
 		}
 	}
 	
