@@ -50,9 +50,6 @@ class Day18 {
 	
 	public void start() {
 		List<Cube> cubes = new InputLoader("input-day-18.txt").getInput();
-//		List<Cube> cubes = new ArrayList<>();
-//		cubes.add(new Cube(1,1,1));
-//		cubes.add(new Cube(2,1,1));
 		
 		long start = System.currentTimeMillis();
 		Grid3D grid = new Grid3D(cubes);
@@ -112,30 +109,42 @@ class Day18 {
 			grid[x][y][z] = true;
 		}
 		
-		private boolean get(int x, int y, int z) {
+		protected boolean get(int x, int y, int z) {
 			// coordinates are outside grid, so there cannot be a cube
-			if(x < 0 || x >= dim[0] || y < 0 || y >= dim[1] || z < 0 || z >= dim[2])
+			if(isBorder(x, y, z))
 				return false;
 			
 //			System.out.println(String.format("x: %d, y: %d, z: %d", x, y, z));
 			
 			return grid[x][y][z];
 		}
+
+		protected boolean isBorder(Cube cube) {
+			return isBorder(cube.x, cube.y, cube.z);
+		}
 		
-		private int exposedSurfaceArea(Cube cube) {
+		protected boolean isBorder(int x, int y, int z) {
+			return x < 0 || x >= dim[0] || y < 0 || y >= dim[1] || z < 0 || z >= dim[2];
+		}	
+		
+		protected int exposedSurfaceArea(Cube cube) {
+			return exposedSurfaceArea(cube.x, cube.y, cube.z);
+		}
+		
+		protected int exposedSurfaceArea(int x, int y, int z) {
 			int exposed = 0;
 			
-			if(!get(cube.x + 1, cube.y, cube.z)) 
+			if(!get(x + 1, y, z)) 
 				exposed++;
-			if(!get(cube.x - 1, cube.y, cube.z)) 
+			if(!get(x - 1, y, z)) 
 				exposed++;
-			if(!get(cube.x, cube.y + 1, cube.z)) 
+			if(!get(x, y + 1, z)) 
 				exposed++;
-			if(!get(cube.x, cube.y - 1, cube.z)) 
+			if(!get(x, y - 1, z)) 
 				exposed++;
-			if(!get(cube.x, cube.y, cube.z + 1)) 
+			if(!get(x, y, z + 1)) 
 				exposed++;
-			if(!get(cube.x, cube.y, cube.z - 1)) 
+			if(!get(x, y, z - 1)) 
 				exposed++;
 			
 			return exposed;
@@ -149,6 +158,27 @@ class Day18 {
 			this.x = x;
 			this.y = y;
 			this.z = z;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if(obj instanceof Cube) {
+				Cube c = (Cube) obj;
+				
+				return c.x == x && c.y == y && c.z == z;
+			}
+			
+			return false;
+		}
+		
+		@Override
+		public String toString() {
+			return x +","+y +"," + z;
+		}
+		
+		@Override
+		public int hashCode() {
+			return toString().hashCode();
 		}
 	}
 	
