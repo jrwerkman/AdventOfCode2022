@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import nl.jrwer.challenge.advent.Day04;
+import nl.jrwer.challenge.advent.day04.Part1;
 
 public abstract class SingleLineInputLoader<T> {
 	
@@ -17,7 +17,7 @@ public abstract class SingleLineInputLoader<T> {
 	
 	public T getInput() {
 		
-        try (InputStream inputStream = Day04.class.getClassLoader().getResourceAsStream(file);
+        try (InputStream inputStream = Part1.class.getClassLoader().getResourceAsStream(file);
         		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
         	String line;
         	
