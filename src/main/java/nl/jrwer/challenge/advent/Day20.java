@@ -77,6 +77,11 @@ class Day20 {
 	
 	
 	public void start() {
+//		System.out.println(-5354 % 4999);
+//		System.out.println(4966 + -355);
+//		
+//		if(true)
+//			return;
 		List<Number> numbers = new InputLoader("input-day-20.txt").getInput();
 		
 		long start = System.currentTimeMillis();
@@ -94,10 +99,12 @@ class Day20 {
 	class Decryptor {
 		final List<Number> numbers;
 		final int length;
+		final int stepLength;
 		
 		public Decryptor(List<Number> numbers) {
 			this.numbers = numbers;
-			this.length = numbers.size();			
+			this.length = numbers.size();
+			this.stepLength = length - 1;
 		}
 		
 		public void decrypt() {
@@ -108,6 +115,9 @@ class Day20 {
 					continue;
 
 				move(currentNumber);
+				
+//				System.out.print(i + "("+currentNumber.value+"): ");
+//				print();
 			}
 		}
 		
@@ -119,6 +129,10 @@ class Day20 {
 				numbers.remove(currentIndex);
 				
 				int newIndex = getNewIndex(currentNumber, currentIndex);
+				
+				if(newIndex > length)
+					throw new RuntimeException("newIndex is too big: " + newIndex);
+				
 				numbers.add(newIndex, currentNumber);
 			} catch (Exception e) {
 				System.err.println("currentIndex: " + currentIndex + ", " +  currentNumber);
@@ -144,22 +158,23 @@ class Day20 {
 		}
 
 		private int getNewIndex(Number number, int currentIndex) {
-			int newIndex = currentIndex + number.value;
+			int distance = number.value % stepLength;
+			int newIndex = currentIndex + distance;
 			
-			if(newIndex <= 0)
-				newIndex = (length + (newIndex / length - 1)) + (newIndex % length);
-			
-			if(newIndex >= length)
-				newIndex = newIndex % length + (newIndex / length);
+			if(newIndex < 0) 
+				newIndex = stepLength + newIndex;
+				
+			if(newIndex > stepLength)
+				newIndex = newIndex - stepLength;
 			
 			return newIndex;
 		}
 		
-		public int getCoordinates() {
+		public long getCoordinates() {
 			Number numberNull = getByValue(0);
 			int index = numbers.indexOf(numberNull);
 			System.out.println("Index of value 0: " + index);
-			int coords = 0;
+			long coords = 0;
 			
 			coords += getValueAfter(index, 1000);
 			coords += getValueAfter(index, 2000);
