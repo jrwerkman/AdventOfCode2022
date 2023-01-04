@@ -126,13 +126,9 @@ class Day20 {
 			
 			try {
 				currentIndex = numbers.indexOf(currentNumber);
-				numbers.remove(currentIndex);
-				
 				int newIndex = getNewIndex(currentNumber, currentIndex);
-				
-				if(newIndex > length)
-					throw new RuntimeException("newIndex is too big: " + newIndex);
-				
+
+				numbers.remove(currentIndex);
 				numbers.add(newIndex, currentNumber);
 			} catch (Exception e) {
 				System.err.println("currentIndex: " + currentIndex + ", " +  currentNumber);
@@ -158,7 +154,7 @@ class Day20 {
 		}
 
 		private int getNewIndex(Number number, int currentIndex) {
-			int distance = number.value % stepLength;
+			int distance = (int) (number.value % stepLength);
 			int newIndex = currentIndex + distance;
 			
 			if(newIndex < 0) 
@@ -183,7 +179,7 @@ class Day20 {
 			return coords;
 		}
 		
-		private int getValueAfter(int index, int amount) {
+		private long getValueAfter(int index, int amount) {
 			int indexValueAfter = 0;
 
 			if(index + amount >= length)
@@ -214,9 +210,9 @@ class Day20 {
 	
 	class Number {
 		final int originalIndex;
-		final int value;
+		final long value;
 		
-		public Number(int originalIndex, int value) {
+		public Number(int originalIndex, long value) {
 			this.originalIndex = originalIndex;
 			this.value = value;
 		}
@@ -246,7 +242,7 @@ class Day20 {
 
 		@Override
 		protected Number handleLine(String line) {
-			Number number = new Number(index, Integer.parseInt(line));
+			Number number = new Number(index, Long.parseLong(line));
 			index++;
 			return number;
 		}
