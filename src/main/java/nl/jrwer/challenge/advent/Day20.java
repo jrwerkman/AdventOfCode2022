@@ -155,21 +155,6 @@ class Day20 {
 			return newIndex;
 		}
 		
-//		private int getNewIndex(Number number, int currentIndex) {
-//			int newIndex = currentIndex + number.value;
-//			
-//			if(newIndex <= 0)
-//				newIndex = (length - 1) + (newIndex % length);
-//			
-//			if(newIndex >= length)
-//				newIndex = (newIndex % length) + 1;
-//			
-//			if(newIndex < 0 && newIndex >= length)
-//				System.out.println("newIndex: " + newIndex);
-//			
-//			return newIndex;
-//		}
-		
 		public int getCoordinates() {
 			Number numberNull = getByValue(0);
 			int index = numbers.indexOf(numberNull);
