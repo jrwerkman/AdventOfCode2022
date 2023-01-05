@@ -1,7 +1,7 @@
 package nl.jrwer.challenge.advent.day21;
 
 enum Operator {
-	DIVIDE, MULTIPLY, ADD, SUBTRACT;
+	EQUAL, DIVIDE, MULTIPLY, ADD, SUBTRACT;
 	
 	public static Operator getOperator(char in) {
 		switch(in) {

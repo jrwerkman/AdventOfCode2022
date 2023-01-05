@@ -5,33 +5,38 @@ import java.util.List;
 import java.util.Queue;
 
 public class Calculator {
-	private final List<Monkey> monkeys;
-	private final Monkey rootMonkey;
+	public static final String ROOT = "root";
+	public static final String YOU = "humn";
 	
-	public Calculator(List<Monkey> monkeys) {
+	protected final List<BaseMonkey> monkeys;
+	protected final BaseMonkey rootMonkey;
+	
+	public Calculator(List<BaseMonkey> monkeys) {
 		this.monkeys = monkeys;
-		this.rootMonkey = getRootMonkey();
+		this.rootMonkey = findRootMonkey();
 	}
 	
-	private Monkey getRootMonkey() {
-		for(Monkey m : this.monkeys)
-			if(m.is("root"))
+	private BaseMonkey findRootMonkey() {
+		for(BaseMonkey m : this.monkeys)
+			if(m.is(ROOT))
 				return m;
 		
 		return null;
 	}
 	
-	public Long getValueRootMonkey() {
-		Queue<Monkey> q = new ArrayDeque<>();
+	public BaseMonkey getRootMonkey() {
+		return rootMonkey;
+	}
+	
+	public void calculateValues() {
+		Queue<BaseMonkey> q = new ArrayDeque<>();
 		q.addAll(monkeys);
 		
 		while(!q.isEmpty()) {
-			Monkey head = q.remove();
+			BaseMonkey head = q.remove();
 			
 			if(!head.findValue())
 				q.add(head);
 		}
-		
-		return rootMonkey.getValue();
 	}
 }

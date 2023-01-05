@@ -14,11 +14,13 @@ class Part1 {
 	}
 	
 	public void start() {
-		List<Monkey> monkeys = new InputLoader("input-day-21.txt").getInput();
+		List<BaseMonkey> monkeys = new InputLoader("input-day-21.txt").getInput();
 		
 		long start = System.currentTimeMillis();
 		Calculator c = new Calculator(monkeys);
-		System.out.println("Result: " + c.getValueRootMonkey());
+		c.calculateValues();
+
+		System.out.println("Result: " + c.rootMonkey.getValue());
 		long end = System.currentTimeMillis();
 		
 		System.out.println("Process took: " + (end - start) + " ms\n");
