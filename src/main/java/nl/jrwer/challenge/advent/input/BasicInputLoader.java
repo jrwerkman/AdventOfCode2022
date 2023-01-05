@@ -41,4 +41,8 @@ public abstract class BasicInputLoader<T> {
 	}
 	
 	protected abstract T handleLine(String line);
+	
+	public List<T> getList() {
+		return list;
+	}
 }
