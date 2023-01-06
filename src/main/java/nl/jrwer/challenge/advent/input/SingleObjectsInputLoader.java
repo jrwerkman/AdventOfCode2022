@@ -8,18 +8,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.jrwer.challenge.advent.day04.Part1;
+import nl.jrwer.challenge.advent.day22.Coord;
+import nl.jrwer.challenge.advent.day22.path.PathElement;
 
-public abstract class MultpleObjectsInputLoader<T> {
+public abstract class SingleObjectsInputLoader<T> {
 	
 	private final String file;
-	private List<T> list = new ArrayList<>();
 	
-	public MultpleObjectsInputLoader(String file) {
+	public SingleObjectsInputLoader(String file) {
 		this.file = file;
 	}
 	
-	public List<T> getInput() {
-		
+	public T getInput() {
         try (InputStream inputStream = Part1.class.getClassLoader().getResourceAsStream(file);
         		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
         	String line;
@@ -28,17 +28,15 @@ public abstract class MultpleObjectsInputLoader<T> {
             	if(line.isBlank())
             		continue;
             	
-            	List<T> obj = handleLine(line);
-            	
-            	if(obj != null)
-            		list.addAll(obj);
+            	handleLine(line);
             }
         } catch (IOException e) {
 			e.printStackTrace();
 		}
         
-        return list;
+        return createObject();
 	}
 	
-	protected abstract List<T> handleLine(String line);
+	protected abstract void handleLine(String line);
+	protected abstract T createObject();
 }
