@@ -1,9 +1,7 @@
 package nl.jrwer.challenge.advent.day22.path;
 
 import nl.jrwer.challenge.advent.day22.Direction;
-import nl.jrwer.challenge.advent.day22.Type;
 import nl.jrwer.challenge.advent.day22.cube.Cube;
-import nl.jrwer.challenge.advent.day22.cube.CubeCoord;
 import nl.jrwer.challenge.advent.day22.cube.CubeSide;
 import nl.jrwer.challenge.advent.day22.cube.CubeSideConnection;
 
@@ -25,7 +23,6 @@ public class PathFinderCube {
 	public void followPath() {
 		while(path.hasNext()) {
 			PathElement elem = path.next();
-
 			// walk
 			cube.walk(elem.steps, currentDirection);
 			
@@ -35,30 +32,27 @@ public class PathFinderCube {
 	}
 	
 	public int getFinalPassword() {
+		System.out.println("cubeside rotation: " + cube.getCurrentRotation());
+		Direction realDirection = currentDirection.addRotation(cube.getCurrentRotation());
+		
 		System.out.println(String.format("row:     1000 * %d = %d", 
 				cube.getCurrentY(), cube.getCurrentY() * 1000));
 		System.out.println(String.format("column:  4 * %d = %d", 
 				cube.getCurrentX(), cube.getCurrentX() * 4));
 		System.out.println(String.format("facing:  %s = %d", 
-				currentDirection.name(), currentDirection.weight));
+				realDirection.name(), realDirection.weight));
 		
 		return cube.getCurrentY() * 1000 
 				+ cube.getCurrentX() * 4 
-				+ currentDirection.weight;
+				+ realDirection.weight;
 	}
 	
 	public void printCube() {
 		for(CubeSide s : cube.cubeSides) {
 			StringBuilder sb = new StringBuilder();
 			sb.append(s.number).append('\n');
-			
-			CubeCoord[][] grid = s.getGrid();
-			for(int y=0; y<grid.length; y++) {
-				for(int x=0; x<grid.length; x++)
-					sb.append(grid[x][y].type == Type.OPEN_TILE ? '.' : '#');
-				
-				sb.append("\n");
-			}
+			sb.append(s);
+
 			System.out.println(sb.toString());
 		}		
 	}

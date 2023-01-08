@@ -16,14 +16,14 @@ class Part2 {
 	}
 	
 	public void start() {
-//		PathFinderCube finder = new InputLoaderCube("input-day-22.txt", 50).getInput();
-//		finder.setSideConnections(CubeSideConnections.CHALLENGE);
+		PathFinderCube finder = new InputLoaderCube("input-day-22.txt", 50).getInput();
+		finder.setSideConnections(CubeSideConnections.CHALLENGE);
 		
-		PathFinderCube finder = new InputLoaderCube("input-day-22-example.txt", 4).getInput();
-		finder.setSideConnections(CubeSideConnections.EXAMPLE);
+//		PathFinderCube finder = new InputLoaderCube("input-day-22-example.txt", 4).getInput();
+//		finder.setSideConnections(CubeSideConnections.EXAMPLE);
 
 		long start = System.currentTimeMillis();
-		finder.printCube();
+//		finder.printCube();
 		finder.followPath();
 		System.out.println("Final password is: " + finder.getFinalPassword());		
 		long end = System.currentTimeMillis();

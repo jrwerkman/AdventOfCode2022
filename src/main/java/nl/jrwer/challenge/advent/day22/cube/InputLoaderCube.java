@@ -70,7 +70,7 @@ public class InputLoaderCube extends SingleObjectsInputLoader<PathFinderCube>{
 			int firstX = firstXSide(i, line);
 			
 			for(int j=0;j<amount; j++) {
-				CubeSide side = new CubeSide(index, dimensions, sides);
+				CubeSide side = new CubeSide(index, dimensions);
 				sides.add(side);
 				index++;
 				

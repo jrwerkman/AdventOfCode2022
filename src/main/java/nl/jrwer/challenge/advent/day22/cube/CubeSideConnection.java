@@ -8,19 +8,27 @@ public class CubeSideConnection {
 		this.two = two;
 	}
 	
-	public CubeSidePair getCurrentSide(CubeSide side) {
-		return getCurrentSide(side.number);
+	public Side getCurrentSide(CubeSide side) {
+		return getCurrentPair(side.number).side;
 	}
 	
-	public CubeSidePair getCurrentSide(int number) {
+	public CubeSidePair getCurrentPair(CubeSide side) {
+		return getCurrentPair(side.number);
+	}
+	
+	public CubeSidePair getCurrentPair(int number) {
 		return one.cube == number ? one : two;
 	}
 
-	public CubeSidePair getOtherSide(CubeSide side) {
-		return getOtherSide(side.number);
+	public Side getOtherSide(CubeSide side) {
+		return getOtherPair(side.number).side;
 	}
 	
-	public CubeSidePair getOtherSide(int number) {
+	public CubeSidePair getOtherPair(CubeSide side) {
+		return getOtherPair(side.number);
+	}
+	
+	public CubeSidePair getOtherPair(int number) {
 		return one.cube == number ? two : one;
 	}
 }

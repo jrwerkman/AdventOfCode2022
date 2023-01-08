@@ -11,4 +11,9 @@ public class CubeCoord {
 		this.y = y;
 		this.type = type;
 	}
+	
+	@Override
+	public String toString() {
+		return x + "," + y + " " + type;
+	}
 }
