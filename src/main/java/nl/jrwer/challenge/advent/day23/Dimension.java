@@ -5,12 +5,12 @@ import java.util.Set;
 public class Dimension {
 	public int minX, maxX, minY, maxY;
 	
-	public Dimension(Set<Coord> coord) {
-		this.set(coord);
+	public Dimension(Set<Elf> elves) {
+		this.set(elves);
 	}
 	
-	private void set(Set<Coord> coords) {
-		if(coords.size() == 0)
+	private void set(Set<Elf> elves) {
+		if(elves.size() == 0)
 			throw new RuntimeException();
 		
 		minX = Integer.MAX_VALUE;
@@ -18,16 +18,16 @@ public class Dimension {
 		minY = Integer.MAX_VALUE;
 		maxY = Integer.MIN_VALUE;
 		
-		for(Coord coord : coords) {
-			if(coord.x < minX)
-				minX = coord.x;
-			if(coord.x > maxX)
-				maxX = coord.x;
+		for(Elf elf : elves) {
+			if(elf.x < minX)
+				minX = elf.x;
+			if(elf.x > maxX)
+				maxX = elf.x;
 
-			if(coord.y < minY)
-				minY = coord.y;
-			if(coord.y > maxY)
-				maxY = coord.y;
+			if(elf.y < minY)
+				minY = elf.y;
+			if(elf.y > maxY)
+				maxY = elf.y;
 		}
 	}
 	

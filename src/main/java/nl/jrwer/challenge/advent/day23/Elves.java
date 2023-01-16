@@ -1,27 +1,26 @@
 package nl.jrwer.challenge.advent.day23;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 public class Elves {
 	private final Set<Elf> elves;
-	private final Set<Coord> elvesCoords = new HashSet<>();
 	
 	private final List<Direction> direction = List.of(
 			Direction.NORTH,
 			Direction.SOUTH,
 			Direction.WEST,
 			Direction.EAST);
-//	private Direction firstDirection = Direction.NORTH;
+
 	private int rounds = 0;
 	
 	
 	public Elves(Set<Elf> elves) {
 		this.elves = elves;
-		
-		for(Elf elf : this.elves)
-			this.elvesCoords.add(elf.getCurrentCoord());
 	}
 	
 	public int executeRounds(int number) {
@@ -29,7 +28,7 @@ public class Elves {
 			executeRound();
 		} while(rounds < number);
 
-		int surfaceArea = new Dimension(elvesCoords).getSurfaceArea();
+		int surfaceArea = new Dimension(elves).getSurfaceArea();
 		System.out.println("  Surface area: " + surfaceArea);
 		System.out.println("  Elves: " + this.elves.size());
 		
@@ -45,23 +44,15 @@ public class Elves {
 	}
 	
 	public int executeRound() {
-//		System.out.println(firstDirection);
-		Set<Elf> proposedElves = propose();
-		Set<Elf> movableElves = movableElves(proposedElves);
-		move(movableElves);
-
-		System.out.println(rounds + " - proposed: " + proposedElves.size() + " - move: " + movableElves.size());
+		Map<Elf, List<Elf>> proposedElves = propose();
+		move(proposedElves);
 		
 		rounds++;
-		// Update first direction
-//		firstDirection = firstDirection.next();
-//		print();
-		
 		return proposedElves.size();
 	}
 	
-	private Set<Elf> propose() {
-		Set<Elf> proposedElves = new HashSet<>();
+	private Map<Elf, List<Elf>> propose() {
+		Map<Elf, List<Elf>> proposedElves = new HashMap<>();
 		
 		for(Elf elf : this.elves) {
 			int n = elvesAt(elf, Direction.NORTH);
@@ -70,18 +61,20 @@ public class Elves {
 			int e = elvesAt(elf, Direction.EAST);
 			
 			
-			if((n == 0 && s == 0 && w == 0 & e == 0) ||
-					(n > 0 && s > 0 && w > 0 & e > 0)) {
+			if((n == 0 && s == 0 && w == 0 && e == 0) ||
+					(n > 0 && s > 0 && w > 0 && e > 0)) {
 				continue;
 			} else {
-
 				Direction dir = nextDirection(n, s, w, e);
+				Elf moved = elf.move(dir);
 				
-//				if(elf.getCurrentCoord().y == 1)
-//					System.out.println(elf.getCurrentCoord() +": d: " + dir + " n:" + n + " - s:" + s + " - w:" +  w + " - e:" +  e);
-				
-				elf.setProposedDirection(dir);
-				proposedElves.add(elf);
+				if(proposedElves.containsKey(moved)) {
+					proposedElves.get(moved).add(elf);
+				} else {
+					List<Elf> elvings = new ArrayList<>();
+					elvings.add(elf);
+					proposedElves.put(moved, elvings);
+				}
 			}
 		}
 		
@@ -90,10 +83,10 @@ public class Elves {
 	
 	private int elvesAt(Elf currentElf, Direction checkDirection) {
 		int amount = 0;
-		Set<Coord> coordsToCheck = currentElf.getCurrentCoord().getAdjacent(checkDirection);
+		Set<Elf> coordsToCheck = currentElf.getAdjacent(checkDirection);
 		
-		for(Coord c : coordsToCheck)
-			if(elvesCoords.contains(c))
+		for(Elf c : coordsToCheck)
+			if(elves.contains(c))
 				amount++;
 						
 		return amount;
@@ -116,93 +109,18 @@ public class Elves {
 		throw new RuntimeException();
 	}
 	
-//	private Set<Elf> propose() {
-//		Set<Elf> proposedElves = new HashSet<>();
-//		
-//		int free = 0;
-//		
-//		for(Elf elf : this.elves) {
-//			if(noElfAdjacent(elf)) {
-//				free++;
-//				continue;
-//			} else { 
-//				getProposedDirection(elf, proposedElves);
-//			}
-//		}
-//		
-//		System.out.println("free: " + free);
-//		
-//		return proposedElves;
-//	}
-	
-//	public boolean noElfAdjacent(Elf currentElf) {
-//		Set<Coord> adjacentCoords = currentElf.getCurrentCoord().allAdjacentCoords();
-//		
-//		for(Coord adjCoord: adjacentCoords) 
-//			if(elvesCoords.contains(adjCoord))
-//				return false;
-//		
-//		return true;
-//	}
-	
-//	private void getProposedDirection(Elf currentElf, Set<Elf> proposedElves) {
-//		Direction checkDirection = firstDirection; 
-//		
-//		for(int i=0; i<Direction.values().length; i++) {
-//			// if a free direction is found and not all direction are free
-//			// dont continue searching.
-//			
-//			if(noElves(currentElf, checkDirection)) {
-//				currentElf.setProposedDirection(checkDirection);
-//				proposedElves.add(currentElf);
-//				return;
-//			}
-//			
-//			// go and check next
-//			checkDirection = checkDirection.next(); 
-//		}
-//	}
-	
-//	private boolean noElves(Elf currentElf, Direction checkDirection) {
-//		Set<Coord> coordsToCheck = currentElf.getCurrentCoord().getAdjacent(checkDirection);
-//		
-//		for(Coord c : coordsToCheck)
-//			if(elvesCoords.contains(c))
-//				return false;
-//						
-//		return true;
-//	}
-	
-	private Set<Elf> movableElves(Set<Elf> proposedElves) {
-		Set<Elf> movableElves = new HashSet<>();
-		
-		for(Elf elf : proposedElves)
-			if(canMove(elf, proposedElves))
-				movableElves.add(elf);
-		
-		return movableElves;
-	}
-	
-	private boolean canMove(Elf currentElf, Set<Elf> proposedElves) {
-		for(Elf elf : proposedElves) {
-			if(elf.equals(currentElf))
-				continue;
-			
-			if(currentElf.sameProposedCoord(elf))
-				return false;
+	private void move(Map<Elf, List<Elf>> proposed) {
+		for(Entry<Elf, List<Elf>> entry : proposed.entrySet()) {
+			if(entry.getValue().size() == 1) {
+				elves.remove(entry.getValue().get(0));
+				elves.add(entry.getKey());
+			}
 		}
-		
-		return true;
-	}
-	
-	private void move(Set<Elf> movableElves) {
-		for(Elf elf : movableElves)
-			elf.move(elvesCoords);
 	}
 	
 	public void print() {
 		StringBuilder sb = new StringBuilder();
-		Dimension dim = new Dimension(elvesCoords);
+		Dimension dim = new Dimension(elves);
 		
 		for(int y=dim.minY; y<=dim.maxY; y++) {
 			for(int x=dim.minX; x<=dim.maxX; x++)
@@ -215,7 +133,7 @@ public class Elves {
 	}
 	
 	private boolean hasElf(int x, int y) {
-		return elvesCoords.contains(new Coord(x, y));
+		return elves.contains(new Elf(-1, x, y));
 	}
 	
 }

@@ -12,18 +12,12 @@ class Part2 {
 	}
 	
 	public void start() {
-		// TODO optimize
 		Elves elves = new InputLoader("input-day-23.txt").getInput();
 
 		long start = System.currentTimeMillis();
-//		elves.print();
 		System.out.println("number of the first round where no Elf moves: " + elves.executeRounds());
-//		elves.print();
 		long end = System.currentTimeMillis();
 		
 		System.out.println("Process took: " + (end - start) + " ms\n");
-		
-		// higher than 456
-		// 881
 	}
 }

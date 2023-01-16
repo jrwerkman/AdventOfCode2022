@@ -16,7 +16,7 @@ class Part1 {
 
 		long start = System.currentTimeMillis();
 //		elves.print();
-		System.out.println("Number of empty ground tiles: " + elves.executeRounds(1));
+		System.out.println("Number of empty ground tiles: " + elves.executeRounds(10));
 //		elves.print();
 		long end = System.currentTimeMillis();
 		
