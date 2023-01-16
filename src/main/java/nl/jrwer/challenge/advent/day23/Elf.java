@@ -1,20 +1,15 @@
 package nl.jrwer.challenge.advent.day23;
 
+import java.util.Set;
 
 public class Elf {
 	private final int id;
 	private Coord currentCoords;
-	private AdjacentCoords adjacentCoords = null;
-	
-	private Direction proposedDirection = null;
 	private Coord proposedCoordinates = null;
-	private boolean canMoveToProposedDirection = false;
-	
 	
 	public Elf(int id, int x, int y) {
 		this.id = id;
 		this.currentCoords = new Coord(x, y);
-		this.adjacentCoords = new AdjacentCoords(currentCoords);
 	}
 	
 	public boolean onCoord(Coord c) {
@@ -26,8 +21,7 @@ public class Elf {
 	}
 	
 	public void setProposedDirection(Direction proposedDirection) {
-		this.proposedDirection = proposedDirection;
-		this.proposedCoordinates = adjacentCoords.getCoord(this.proposedDirection);
+		this.proposedCoordinates = currentCoords.move(proposedDirection);
 	}
 	
 	@Override
@@ -42,54 +36,24 @@ public class Elf {
 		
 	}
 	
-	public AdjacentCoords getAdjacentCoords() {
-		return adjacentCoords;
-	}
-	
-	public boolean hasProposedCoords() {
-		return proposedCoordinates != null;
-	}
+	public void move(Set<Coord> elfCoords) {
+		elfCoords.remove(currentCoords);
+		elfCoords.add(proposedCoordinates);
 
-	public boolean canMove() {
-		return canMoveToProposedDirection;
-	}
-
-	public void setCanMove(boolean canMove) {
-		canMoveToProposedDirection = canMove;
-	}
-	
-	public void move() {
-		if(canMoveToProposedDirection) {
-			doMove();
-			adjacentCoords = new AdjacentCoords(currentCoords);
-		}
-		
-		// reset values
-		proposedDirection = null;
+		currentCoords = proposedCoordinates;
 		proposedCoordinates = null;
-		canMoveToProposedDirection = false;		
-	}
-	
-	private void doMove() {
-		switch(proposedDirection) {
-		case EAST:
-			currentCoords.moveEast();
-			break;
-		case NORTH:
-			currentCoords.moveNorth();
-			break;
-		case SOUTH:
-			currentCoords.moveSouth();
-			break;
-		case WEST:
-			currentCoords.moveWest();
-			break;
-		default:
-			throw new RuntimeException();
-		}
 	}
 	
 	public Coord getCurrentCoord() {
 		return currentCoords;
+	}
+	
+	public Coord getProposedCoord() {
+		return proposedCoordinates;
+	}
+	
+	@Override
+	public int hashCode() {
+		return currentCoords.hashCode();
 	}
 }

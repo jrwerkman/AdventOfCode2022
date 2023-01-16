@@ -1,156 +1,208 @@
 package nl.jrwer.challenge.advent.day23;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Elves {
-	private final List<Elf> elves;
+	private final Set<Elf> elves;
+	private final Set<Coord> elvesCoords = new HashSet<>();
 	
-	private Direction firstDirection = Direction.NORTH;
+	private final List<Direction> direction = List.of(
+			Direction.NORTH,
+			Direction.SOUTH,
+			Direction.WEST,
+			Direction.EAST);
+//	private Direction firstDirection = Direction.NORTH;
+	private int rounds = 0;
 	
 	
-	public Elves(List<Elf> elves) {
+	public Elves(Set<Elf> elves) {
 		this.elves = elves;
+		
+		for(Elf elf : this.elves)
+			this.elvesCoords.add(elf.getCurrentCoord());
 	}
 	
 	public int executeRounds(int number) {
-		for(int i=0; i<number; i++)
+		do {
 			executeRound();
+		} while(rounds < number);
 
-		int surfaceArea = getSurface();
+		int surfaceArea = new Dimension(elvesCoords).getSurfaceArea();
 		System.out.println("  Surface area: " + surfaceArea);
-		System.out.println("  Elves: " + elves.size());
+		System.out.println("  Elves: " + this.elves.size());
 		
-		return surfaceArea - elves.size();
+		return surfaceArea - this.elves.size();
 	}
 	
-	public int getSurface() {
-		Dimension surface = getSurfaceDimension();
-		
-		System.out.println("  minX: " + surface.minX);
-		System.out.println("  maxX: " + surface.maxX);
-		System.out.println("  minY: " + surface.minY);
-		System.out.println("  maxY: " + surface.maxY);
-		
-		return ((surface.maxX - surface.minX) + 1) * ((surface.maxY - surface.minY) + 1);
-	}
-	
-	public Dimension getSurfaceDimension() {
-		if(elves.size() == 0)
-			throw new RuntimeException();
-		
-		Coord coord = elves.get(0).getCurrentCoord();
-		Dimension surface = new Dimension();
-		
-		surface.minX = coord.x;
-		surface.maxX = coord.x;
-		surface.minY = coord.y;
-		surface.maxY = coord.y;
-		
-		for(int i=1; i<elves.size(); i++) {
-			coord = elves.get(i).getCurrentCoord();
-//			System.out.println(coord);
-			
-			if(coord.x < surface.minX)
-				surface.minX = coord.x;
-			if(coord.x > surface.maxX)
-				surface.maxX = coord.x;
+	public int executeRounds() {
+		do {
+			// nothing to do
+		} while(executeRound() > 0);
 
-			if(coord.y < surface.minY)
-				surface.minY = coord.y;
-			if(coord.y > surface.maxY)
-				surface.maxY = coord.y;
-		}
-		
-		return surface;
+		return rounds;
 	}
 	
-	public void executeRound() {
+	public int executeRound() {
 //		System.out.println(firstDirection);
-		propose();
-		setCanMove();
-		move();
+		Set<Elf> proposedElves = propose();
+		Set<Elf> movableElves = movableElves(proposedElves);
+		move(movableElves);
+
+		System.out.println(rounds + " - proposed: " + proposedElves.size() + " - move: " + movableElves.size());
 		
+		rounds++;
 		// Update first direction
-		firstDirection = firstDirection.next();
+//		firstDirection = firstDirection.next();
 //		print();
-	}
-	
-	private void propose() {
-		for(Elf elf : elves) {
-			Direction proposedDirection = getProposedDirection(elf);
-			
-			if(proposedDirection != null)
-				elf.setProposedDirection(proposedDirection);
-		}
-	}
-	
-	private Direction getProposedDirection(Elf currentElf) {
-		AdjacentCoords adjacentCoords = currentElf.getAdjacentCoords();
 		
-		int freeDirections = 0;
-		Direction firstFreeDirection = null;
-		Direction checkDirection = firstDirection; 
-
-		for(int i=0; i<Direction.values().length; i++) {
-			// if a free direction is found and not all direction are free
-			// dont continue searching.
-			if(freeDirections == 1 && i < freeDirections)
-				break;
+		return proposedElves.size();
+	}
+	
+	private Set<Elf> propose() {
+		Set<Elf> proposedElves = new HashSet<>();
+		
+		for(Elf elf : this.elves) {
+			int n = elvesAt(elf, Direction.NORTH);
+			int s = elvesAt(elf, Direction.SOUTH);
+			int w = elvesAt(elf, Direction.WEST);
+			int e = elvesAt(elf, Direction.EAST);
 			
-			if(!hasElf(adjacentCoords, checkDirection)) {
-				// if is a free direction add
-				freeDirections++;
+			
+			if((n == 0 && s == 0 && w == 0 & e == 0) ||
+					(n > 0 && s > 0 && w > 0 & e > 0)) {
+				continue;
+			} else {
+
+				Direction dir = nextDirection(n, s, w, e);
 				
-				// register the first free direction
-				if(firstFreeDirection == null)
-					firstFreeDirection = checkDirection; 
+//				if(elf.getCurrentCoord().y == 1)
+//					System.out.println(elf.getCurrentCoord() +": d: " + dir + " n:" + n + " - s:" + s + " - w:" +  w + " - e:" +  e);
+				
+				elf.setProposedDirection(dir);
+				proposedElves.add(elf);
 			}
-
-			
-			// go and check next
-			checkDirection = checkDirection.next(); 
 		}
 		
-		return freeDirections == 4 ? null : firstFreeDirection;
+		return proposedElves;
 	}
 	
-	private boolean hasElf(AdjacentCoords adjacentCoords, Direction checkDirection) {
-		for(Elf elf : elves)
-			if(adjacentCoords.hasElf(checkDirection, elf))
-				return true;
+	private int elvesAt(Elf currentElf, Direction checkDirection) {
+		int amount = 0;
+		Set<Coord> coordsToCheck = currentElf.getCurrentCoord().getAdjacent(checkDirection);
 		
-		return false;
+		for(Coord c : coordsToCheck)
+			if(elvesCoords.contains(c))
+				amount++;
+						
+		return amount;
 	}
 	
-	private void setCanMove() {
-		for(Elf elf : elves)
-			setCanMove(elf);
-	}
-	
-	private void setCanMove(Elf currentElf) {
-		if(!currentElf.hasProposedCoords())
-			return;
+	private Direction nextDirection(int n, int s, int w, int e) {
+		for(int i=0; i<direction.size(); i++) {
+			Direction next = direction.get((i + rounds) % direction.size());
+			
+			if(n == 0 && next == Direction.NORTH)
+				return Direction.NORTH;
+			if(s == 0 && next == Direction.SOUTH)
+				return Direction.SOUTH;
+			if(w == 0 && next == Direction.WEST)
+				return Direction.WEST;
+			if(e == 0 && next == Direction.EAST)
+				return Direction.EAST;
+		}
 		
-		for(Elf elf : elves) {
+		throw new RuntimeException();
+	}
+	
+//	private Set<Elf> propose() {
+//		Set<Elf> proposedElves = new HashSet<>();
+//		
+//		int free = 0;
+//		
+//		for(Elf elf : this.elves) {
+//			if(noElfAdjacent(elf)) {
+//				free++;
+//				continue;
+//			} else { 
+//				getProposedDirection(elf, proposedElves);
+//			}
+//		}
+//		
+//		System.out.println("free: " + free);
+//		
+//		return proposedElves;
+//	}
+	
+//	public boolean noElfAdjacent(Elf currentElf) {
+//		Set<Coord> adjacentCoords = currentElf.getCurrentCoord().allAdjacentCoords();
+//		
+//		for(Coord adjCoord: adjacentCoords) 
+//			if(elvesCoords.contains(adjCoord))
+//				return false;
+//		
+//		return true;
+//	}
+	
+//	private void getProposedDirection(Elf currentElf, Set<Elf> proposedElves) {
+//		Direction checkDirection = firstDirection; 
+//		
+//		for(int i=0; i<Direction.values().length; i++) {
+//			// if a free direction is found and not all direction are free
+//			// dont continue searching.
+//			
+//			if(noElves(currentElf, checkDirection)) {
+//				currentElf.setProposedDirection(checkDirection);
+//				proposedElves.add(currentElf);
+//				return;
+//			}
+//			
+//			// go and check next
+//			checkDirection = checkDirection.next(); 
+//		}
+//	}
+	
+//	private boolean noElves(Elf currentElf, Direction checkDirection) {
+//		Set<Coord> coordsToCheck = currentElf.getCurrentCoord().getAdjacent(checkDirection);
+//		
+//		for(Coord c : coordsToCheck)
+//			if(elvesCoords.contains(c))
+//				return false;
+//						
+//		return true;
+//	}
+	
+	private Set<Elf> movableElves(Set<Elf> proposedElves) {
+		Set<Elf> movableElves = new HashSet<>();
+		
+		for(Elf elf : proposedElves)
+			if(canMove(elf, proposedElves))
+				movableElves.add(elf);
+		
+		return movableElves;
+	}
+	
+	private boolean canMove(Elf currentElf, Set<Elf> proposedElves) {
+		for(Elf elf : proposedElves) {
 			if(elf.equals(currentElf))
 				continue;
 			
 			if(currentElf.sameProposedCoord(elf))
-				return;
+				return false;
 		}
 		
-		// default canMove is false
-		currentElf.setCanMove(true);
+		return true;
 	}
 	
-	private void move() {
-		for(Elf elf : elves)
-			elf.move();
+	private void move(Set<Elf> movableElves) {
+		for(Elf elf : movableElves)
+			elf.move(elvesCoords);
 	}
 	
 	public void print() {
 		StringBuilder sb = new StringBuilder();
-		Dimension dim = getSurfaceDimension();
+		Dimension dim = new Dimension(elvesCoords);
 		
 		for(int y=dim.minY; y<=dim.maxY; y++) {
 			for(int x=dim.minX; x<=dim.maxX; x++)
@@ -163,13 +215,7 @@ public class Elves {
 	}
 	
 	private boolean hasElf(int x, int y) {
-		Coord c = new Coord(x, y);
-		
-		for(Elf elf : elves)
-			if(elf.getCurrentCoord().equals(c))
-				return true;
-		
-		return false;
+		return elvesCoords.contains(new Coord(x, y));
 	}
 	
 }

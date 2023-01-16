@@ -1,14 +1,14 @@
 package nl.jrwer.challenge.advent.day23;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import nl.jrwer.challenge.advent.input.SingleObjectsInputLoader;
 
 class InputLoader extends SingleObjectsInputLoader<Elves>{
 
 	int id = 0;
-	List<Elf> elves = new ArrayList<>();
+	Set<Elf> elves = new HashSet<>();
 	int y = 0;
 	
 	public InputLoader(String file) {
