@@ -16,17 +16,34 @@ public class Valley {
 	}
 	
 	public int findExit() {
+		return findExit(
+				entrance.clone(Type.EXPEDITION), 
+				exit.clone(Type.EXIT)).time;
+	}
+	
+	public int findExitRoundTrip(int amount) {
 		Coord start = entrance.clone(Type.EXPEDITION);
+		Coord finish = exit.clone(Type.EXIT);
 		
+		for(int i=0; i<amount; i++) {
+			Coord nextStart = findExit(start, finish).clone();
+			
+			finish = start;
+			start = nextStart;
+		}
+		
+		return start.time;
+	}
+	
+	public Coord findExit(Coord start, Coord finish) {
 		Queue<Coord> q = new ArrayDeque<>();
-		start.visited = true;
 		q.add(start);
 
 		while(!q.isEmpty()) {
 			Coord c = q.poll();
 
-			if(c.equals(exit))
-				return c.time;
+			if(c.equals(finish))
+				return c;
 			
 			Set<Coord> next = c.getMoves();
 			for(Coord n : next) {
@@ -34,7 +51,7 @@ public class Valley {
 					q.add(n);
 			}
 		}
-		
-		return -1;
+
+		throw new RuntimeException("No escape found");
 	}
 }

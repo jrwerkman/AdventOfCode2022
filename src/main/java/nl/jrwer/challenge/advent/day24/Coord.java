@@ -50,11 +50,11 @@ public class Coord {
 	}
 
 	public Coord clone() {
-		return new Coord(type, x, y);
+		return new Coord(time, type, x, y);
 	}
 
 	public Coord clone(Type type) {
-		return new Coord(type, x, y);
+		return new Coord(time, type, x, y);
 	}
 	
 	public Set<Coord> getMoves() {
