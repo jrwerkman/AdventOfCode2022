@@ -14,7 +14,7 @@ public class Part1 {
 	}
 	
 	public void start() {
-		List<Monkey> monkeys = new InputLoader("input-day-11.txt").getInput();
+		List<Monkey> monkeys = new InputLoader("input-day-11.txt", 3).getInput();
 
 		for(int i=0; i<20; i++)
 			for(Monkey monkey : monkeys)

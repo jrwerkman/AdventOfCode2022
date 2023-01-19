@@ -14,14 +14,14 @@ public class Part2 {
 	}
 	
 	public void start() {
-		List<SecondMonkey> monkeys = new SecondInputLoader("input-day-11.txt").getInput();
+		List<Monkey> monkeys = new SecondInputLoader("input-day-11.txt").getInput();
 
 		for(int i=0; i<10000; i++)
-			for(SecondMonkey monkey : monkeys)
+			for(Monkey monkey : monkeys)
 				monkey.throwItems(monkeys);
 		
 		long highest = 0, higher = 0;
-		for(SecondMonkey monkey : monkeys) {
+		for(Monkey monkey : monkeys) {
 			int inspectedItems = monkey.inspectedItems;
 			System.out.println("Monkey " + monkey.number + ": " + monkey.inspectedItems);
 			
@@ -34,8 +34,6 @@ public class Part2 {
 				}
 			}
 		}
-		
-		// TODO proper inheritance
 		
 		System.out.println("\nhigher: " + higher);
 		System.out.println("highest: " + highest);

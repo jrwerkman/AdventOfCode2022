@@ -5,12 +5,20 @@ import java.util.List;
 import nl.jrwer.challenge.advent.input.MultipleLinesInputLoader;
 
 class InputLoader extends MultipleLinesInputLoader<Monkey>{
-	public InputLoader(String file) {
+	protected final int divider;
+	
+	public InputLoader(String file, int divider) {
 		super(file, 6);
+		
+		this.divider = divider;
+	}
+
+	protected InputLoader(String file) {
+		this(file, -1);
 	}
 
 	protected Monkey handleLines(String[] lines) {
-		Monkey monkey = new Monkey();
+		Monkey monkey = new Monkey(divider);
 		
 		for(String line : lines)
 			processLine(monkey, line);
@@ -18,7 +26,7 @@ class InputLoader extends MultipleLinesInputLoader<Monkey>{
 		return monkey;
 	}
 	
-	private void processLine(Monkey monkey, String line) {
+	protected void processLine(Monkey monkey, String line) {
 		if(line.startsWith("Monkey"))
 			monkey.number = Integer.parseInt(line.replaceAll("[^0-9]+", ""));
 		
@@ -41,6 +49,10 @@ class InputLoader extends MultipleLinesInputLoader<Monkey>{
 	private void processStartingItems(Monkey monkey, String line) {
 		String[] items = line.replaceAll("[^,0-9]+", "").split(",");
 		
+		createItems(monkey, items);
+	}
+	
+	protected void createItems(Monkey monkey, String[] items) {
 		for(String item : items) {
 			Item itemObject = new Item();
 			itemObject.worryLevel = Integer.parseInt(item);
@@ -49,7 +61,7 @@ class InputLoader extends MultipleLinesInputLoader<Monkey>{
 		}
 	}
 	
-	private void processOperation(Monkey monkey, String line) {
+	protected void processOperation(Monkey monkey, String line) {
 		if(line.contains("*"))
 			monkey.operator = Operator.MULTIPLY;
 		if(line.contains("+"))
@@ -61,7 +73,7 @@ class InputLoader extends MultipleLinesInputLoader<Monkey>{
 			monkey.calculateConstant = Integer.parseInt(line.replaceAll("[^0-9]+", ""));
 	}
 	
-	private int count(String input, String word) {
+	protected int count(String input, String word) {
 		if(input.length() < word.length())
 			return 0;
 		else if(input.length() == word.length())
