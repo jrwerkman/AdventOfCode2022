@@ -1,72 +1,89 @@
 package nl.jrwer.challenge.advent.day14;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 class RockMap {
-	final Coord fallingStart = new Coord(500, 0, 'R');
+	final Coord fallingStart = new Coord(500, 0);
+	final int lowest;
+	final int floor;
 
-	List<Coord> coords = new ArrayList<>();
-
+	Set<Coord> coords = new HashSet<>();
 	int amount = 0;
 
 	public RockMap(List<String> rocks) {
-		for (String rock : rocks) {
+		for (String rock : rocks)
 			addCoords(rock.split(" -> "));
-		}
+		
+		lowest = findLowest();
+		floor = lowest + 2;
 	}
-
+	
+	private int findLowest() {
+		int lowestY = 0;
+		
+		for(Coord c : coords) {
+			if(c.y > lowestY)
+				lowestY = c.y;
+		}
+		
+		return lowestY;
+	}	
+	
 	public boolean nextRock() {
 		return nextRock(fallingStart);
 	}
 
 	private boolean nextRock(Coord stone) {
-		Coord obstacle = inXAxis(stone);
+		Coord obstacle;
+		do {
+			obstacle = stone.down();
+			
+			if(coords.contains(obstacle))
+				break;
+			else 
+				stone = obstacle;
+		} while(canFall(stone));
 
-		if (obstacle == null)
-			return false;
-
+		
 		boolean leftOccupied = isOccupied(obstacle.left());
 		boolean rightOccupied = isOccupied(obstacle.right());
 
-		if (leftOccupied && rightOccupied)
-			return addStone(obstacle.x, obstacle.y - 1);
-
-		if (!leftOccupied)
-			return nextRock(new Coord(stone.x - 1, obstacle.y - 1, 'o'));
-		else
-			return nextRock(new Coord(stone.x + 1, obstacle.y - 1, 'o'));
+		if(!next(stone, leftOccupied, rightOccupied)) {
+			return false;
+		} else if (leftOccupied && rightOccupied) {
+			amount++;
+			coords.add(obstacle.up());
+			return true;
+		} else if (!leftOccupied) {
+			return nextRock(stone.left());
+		} else {
+			return nextRock(stone.right());
+		}
+	}
+	
+	protected boolean canFall(Coord stone) {
+		return stone.y < lowest;
+	}
+	
+	protected boolean next(Coord stone, boolean leftOccupied, boolean rightOccupied) {
+		return !(stone.y >= lowest);
 	}
 
-	protected Coord inXAxis(Coord c) {
-		Coord highest = null;
-
-		for (Coord coord : coords)
-			if (coord.x == c.x && coord.y > c.y) {
-				if (highest == null)
-					highest = coord;
-				else if (highest.y > coord.y)
-					highest = coord;
-			}
-
-//			System.out.println("highest: " + higest + "  (" + c + ")");
-
-		return highest;
-	}
-
-	protected boolean isOccupied(Coord c) {
-		return coords.contains(c);
+	protected boolean isOccupied(Coord stone) {
+		return coords.contains(stone);
 	}
 
 	private void addCoords(String[] rockPath) {
-		Coord begin = new Coord(rockPath[0], '#');
-		add(begin);
+		Coord begin = new Coord(rockPath[0]);
+		coords.add(begin);
 
 		for (int i = 1; i < rockPath.length; i++) {
-			Coord end = new Coord(rockPath[i], '#');
+			Coord end = new Coord(rockPath[i]);
 
 			addDelta(begin, end);
-			add(end);
+			coords.add(end);
 
 			begin = end;
 		}
@@ -76,70 +93,17 @@ class RockMap {
 		if (first.x == second.x) {
 			if (first.y < second.y)
 				for (int i = first.y + 1; i < second.y; i++)
-					add(first.x, i, '#');
+					coords.add(new Coord(first.x, i));
 			else
 				for (int i = second.y + 1; i < first.y; i++)
-					add(first.x, i, '#');
+					coords.add(new Coord(first.x, i));
 		} else {
 			if (first.x < second.x)
 				for (int i = first.x + 1; i < second.x; i++)
-					add(i, first.y, '#');
+					coords.add(new Coord(i, first.y));
 			else
 				for (int i = second.x + 1; i < first.x; i++)
-					add(i, first.y, '#');
+					coords.add(new Coord(i, first.y));
 		}
-	}
-
-	protected boolean addStone(int x, int y) {
-		add(x, y, 'o');
-		amount++;
-		return true;
-	}
-
-	protected void add(int x, int y, char value) {
-		add(new Coord(x, y, value));
-	}
-
-	private void add(Coord coord) {
-		if (!coords.contains(coord))
-			coords.add(coord);
-	}
-
-	public void print() {
-		int xMin = 500, xMax = 500, yMin = 0, yMax = 0;
-
-		for (Coord c : coords) {
-			if (c.x < xMin)
-				xMin = c.x;
-			if (c.x > xMax)
-				xMax = c.x;
-			if (c.y < yMin)
-				yMin = c.y;
-			if (c.y > yMax)
-				yMax = c.y;
-		}
-
-		xMin -= 3;
-		yMin--;
-		xMax += 2;
-		yMax++;
-
-		char[][] grid = new char[yMax - yMin][xMax - xMin];
-		for (int y = 0; y < grid.length; y++) {
-			for (int x = 0; x < grid[y].length; x++) {
-				int realX = x + xMin + 1;
-				int realY = y + yMin + 1;
-
-				int index = coords.indexOf(new Coord(realX, realY, '#'));
-
-				if (index >= 0)
-					grid[y][x] = coords.get(index).value;
-				else
-					grid[y][x] = '.';
-			}
-		}
-
-		for (int i = 0; i < grid.length; i++)
-			System.out.println(grid[i]);
 	}
 }

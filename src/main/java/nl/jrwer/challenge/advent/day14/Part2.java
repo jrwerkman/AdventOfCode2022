@@ -17,16 +17,16 @@ class Part2 {
 	public void start() {
 		List<String> rocks = new InputLoader("input-day-14.txt").getInput();
 
+		long start = System.currentTimeMillis();
 		NewRockMap map = new NewRockMap(rocks);
-		System.out.println(map.floor);
 		
 		while(map.nextRock()) {
-//			map.print();
+			// do nothing
 		}
 		
-		map.print();
+		System.out.println("Units of sand: " + map.amount);
+		long end = System.currentTimeMillis();
 		
-		// TODO optimize speed
-		System.out.println(map.amount);
+		System.out.println("Process took: " + (end - start) + " ms\n");
 	}
 }

@@ -3,49 +3,34 @@ package nl.jrwer.challenge.advent.day14;
 import java.util.List;
 
 class NewRockMap extends RockMap {
-	
-	final int floor;
 
 	public NewRockMap(List<String> rocks) {
 		super(rocks);
-		
-		floor = findFloor();
-	}
-	
-	private int findFloor() {
-		int lowestY = 0;
-		
-		for(Coord c : coords) {
-			if(c.y > lowestY)
-				lowestY = c.y;
-		}
-		
-		return lowestY + 2;
 	}
 	
 	@Override
-	protected Coord inXAxis(Coord c) {
-		Coord highest = super.inXAxis(c);
-		
-		if(highest == null)
-			highest = new Coord(c.x, floor, '#');
-		
-		return highest;
-	}
-	
-	@Override
-	protected boolean isOccupied(Coord c) {
-		if(c.y == floor)
+	protected boolean isOccupied(Coord stone) {
+		if(stone.y == floor)
 			return true;
 		
-		return coords.contains(c);
+		return coords.contains(stone);
+	}
+
+	@Override
+	protected boolean next(Coord stone, boolean leftOccupied, boolean rightOccupied) {
+		if(fallingStart.equals(stone) && leftOccupied  && rightOccupied) {
+			// add last stone
+			amount++;
+			return false;
+		}
+		
+		return true;
+
 	}
 	
 	@Override
-	protected boolean addStone(int x, int y) {
-		add(x, y, 'o');
-		amount++;
-		
-		return !fallingStart.equals(x, y);
+	protected boolean canFall(Coord stone) {
+		return stone.y < floor;
 	}
+		
 }

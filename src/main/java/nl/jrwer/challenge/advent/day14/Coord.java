@@ -1,27 +1,27 @@
 package nl.jrwer.challenge.advent.day14;
 
 class Coord {
-	int x, y;
-	char value;
+	final int x, y;
 	
-	public Coord(int x, int y, char value) {
+	public Coord(int x, int y) {
 		this.x = x;
 		this.y = y;
-		
-		this.value = value;
 	}
 	
-	public Coord(String input, char value) {
+	public Coord(String input) {
 		String[] split = input.split(",");
 		
 		this.x = Integer.parseInt(split[0]);
 		this.y = Integer.parseInt(split[1]);
-		
-		this.value = value;
 	}
 	
 	public boolean equals(int x, int y) {
 		return this.x == x && this.y == y;
+	}
+	
+	@Override
+	public int hashCode() {
+		return x << 8 | y;
 	}
 	
 	@Override
@@ -36,38 +36,26 @@ class Coord {
 	
 	@Override
 	public String toString() {
-		return x + "," + y + " - " + value;
+		return x + "," + y;
 	}
 	
 	public Coord left() {
-		Coord c = this.clone();
-		c.x--;
-		
-		return c;
+		return new Coord(x - 1, y);
 	}
 	
 	public Coord down() {
-		Coord c = this.clone();
-		c.y++;
-		
-		return c;
+		return new Coord(x, y + 1);
 	}
 	
 	public Coord up() {
-		Coord c = this.clone();
-		c.y--;
-		
-		return c;
+		return new Coord(x, y - 1);
 	}
 	
 	public Coord right() {
-		Coord c = this.clone();
-		c.x++;
-		
-		return c;
+		return new Coord(x + 1, y);
 	}
 	
 	public Coord clone() {
-		return new Coord(x,y,value);
+		return new Coord(x,y);
 	}
 }
