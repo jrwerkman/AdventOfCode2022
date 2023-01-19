@@ -14,7 +14,6 @@ class Register {
 	public Register(int startCycleToMeasure, int increment) {
 		this.cycleToMeasure = startCycleToMeasure;
 		this.increment = increment;
-		
 	}
 	
 	public Integer executeInstuction(Instruction instruction) {
@@ -51,7 +50,9 @@ class Register {
 		return xRegister;
 	}
 	
-	public void resetCycle() {
+	public int resetCycle() {
 		passedCycles = 0;
+		
+		return passedCycles;
 	}
 }

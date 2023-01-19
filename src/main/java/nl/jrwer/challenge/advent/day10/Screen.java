@@ -8,15 +8,15 @@ class Screen {
 	StringBuilder screen = new StringBuilder();
 	
 	public void input(Instruction instruction) {
-		for(int i=0; i< instruction.cycles; i++) {
+		for(int i=0; i<instruction.cycles; i++) {
 			int cycle = register.getCycle();
 			int cursor = register.getRegisterX();
 
 			if(cycle == width) {
 				screen.append('\n');
-				register.resetCycle();
+				cycle = register.resetCycle();
 			}
-			
+
 			// draw
 			if(cursor - 1 <= cycle && cursor + 1 >= cycle)
 				screen.append('#');

@@ -18,11 +18,9 @@ public class Part2 {
 
 		Screen screen = new Screen();
 
-		for(Instruction instruction : instructions) {
+		for(Instruction instruction : instructions)
 			screen.input(instruction);
-		}
 		
-		// TODO check print
 		System.out.println(screen.getFrame());
 	}
 }

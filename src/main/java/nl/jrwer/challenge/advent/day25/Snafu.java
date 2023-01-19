@@ -43,15 +43,7 @@ public class Snafu {
 		
 		int position = (int) (Math.log(decimal) / Math.log(5));
 		long number = decimal;
-		
-//		System.out.println("200000" + ", " + new Snafu("200000").getDecimal() + ", " + (4890-6250));
-//		System.out.println("2=0000" + ", " + new Snafu("2=0000").getDecimal() + ", " + (4890-5000));
-//		System.out.println("2=-000" + ", " + new Snafu("2=-000").getDecimal() + ", " + (4890-4875));
-//		System.out.println("2=-100" + ", " + new Snafu("2=-100").getDecimal() + ", " + (4890-4900));
-//		System.out.println("2=-1=0" + ", " + new Snafu("2=-1=0").getDecimal() + ", " + (4890-4890));
-//		System.out.println(new Snafu("2000").getDecimal());
-//		System.out.println();
-		
+
 		for(int i=position; i>=0; i--) 
 			number = toSnafu(number, i);
 

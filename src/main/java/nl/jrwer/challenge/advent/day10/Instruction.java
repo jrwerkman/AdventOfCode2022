@@ -8,4 +8,9 @@ abstract class Instruction {
 		this.cycles = cycles;
 		this.value = value;
 	}
+	
+	@Override
+	public String toString() {
+		return "value: " + value + ", cycles: " + cycles;
+	}
 }
