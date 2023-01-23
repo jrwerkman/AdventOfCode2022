@@ -1,6 +1,6 @@
 package nl.jrwer.challenge.advent.day16;
 
-class State {
+public class State {
 
 	final int time;
 	final int flowRate;

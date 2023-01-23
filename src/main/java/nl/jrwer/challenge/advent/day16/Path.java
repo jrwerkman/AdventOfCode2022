@@ -1,27 +1,29 @@
 package nl.jrwer.challenge.advent.day16;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-class Path {
+public class Path {
 
 	final int number;
 	final Settings settings;
 	final State state;
 
 	final Valve currentValve;
-	final Valve[] openedValves;
+	final Set<Valve> openedValves;
 	
 	public Path(Settings settings, Valve first) {
 		this.number = 0;
 		this.settings = settings;
 		this.currentValve = first;
-		this.openedValves = new Valve[0];
+		this.openedValves = new HashSet<Valve>();
 		this.state = new State(0, 0, 0);
 	}
 	
 	Path(Settings settings, State state, Valve currentValve, 
-			Valve[] openedValves) {
+			Set<Valve> openedValves) {
 		this.number = 0;
 		this.settings = settings;
 		this.state = state;
@@ -33,12 +35,12 @@ class Path {
 		this.number = number;
 		this.settings = settings;
 		this.currentValve = first;
-		this.openedValves = new Valve[0];
+		this.openedValves = new HashSet<Valve>();
 		this.state = new State(0, 0, 0);
 	}
 	
 	Path(int number, Settings settings, State state, Valve currentValve, 
-			Valve[] openedValves) {
+			Set<Valve> openedValves) {
 		this.number = number;
 		this.settings = settings;
 		this.state = state;
@@ -93,33 +95,26 @@ class Path {
 	}
 	
 	public List<Route> get(Routes routes, Valve currentValve) {
+		List<Route> possibleNextRoutes = routes.get(currentValve.name);
 		List<Route> nextRoutes = new ArrayList<>();
 		
-		for(Route r : routes)
-			if(r.from.name.equals(currentValve.name))
-				if(!isValveOpened(r.to))
-					nextRoutes.add(r);
+		for(Route r : possibleNextRoutes)
+			if(!isValveOpened(r.to))
+				nextRoutes.add(r);
 
 		return nextRoutes;
 	}
 	
 	public boolean isValveOpened(Valve valve) {
-		for(Valve v : openedValves) 
-			if(v.equals(valve))
-				return true;
-		
-		return false;
+		return openedValves.contains(valve);
 	}
 	
-	public Valve[] copy(Valve[] arr, Valve add) {
-		Valve[] newArr = new Valve[arr.length + 1];
+	public Set<Valve> copy(Set<Valve> set, Valve add) {
+		Set<Valve> copy = new HashSet<>();
+		copy.addAll(set);
+		copy.add(add);
 		
-		for(int i=0; i<arr.length; i++)
-			newArr[i] = arr[i];
-		
-		newArr[newArr.length - 1] = add;
-	
-		return newArr;
+		return copy;
 	}
 	
 	@Override

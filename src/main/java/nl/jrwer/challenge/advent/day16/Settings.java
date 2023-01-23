@@ -1,9 +1,9 @@
 package nl.jrwer.challenge.advent.day16;
 
-class Settings {
-	final int persons;
-	final int time;
-	final int totalTime;
+public class Settings {
+	public final int persons;
+	public final int time;
+	public final int totalTime;
 	
 	public Settings(int persons, int time) {
 		this.time = time;

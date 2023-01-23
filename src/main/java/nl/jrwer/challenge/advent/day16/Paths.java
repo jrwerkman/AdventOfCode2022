@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-class Paths {
+public class Paths {
 
 	final Settings settings;
 	final Path[] paths;
@@ -50,17 +50,19 @@ class Paths {
 	}
 
 	public void finishPaths(List<Paths> next) {
-		Path[] nextPaths = Arrays.copyOf(paths, paths.length);
+		Path[] nextPaths = new Path[paths.length];
 
 		for (int i = 0; i < nextPaths.length; i++) {
-			int remainingTime = settings.time - nextPaths[i].state.time;
+			int remainingTime = settings.time - paths[i].state.time;
 
 			if (remainingTime > 0) {
-				Path p = nextPaths[i];
+				Path p = paths[i];
 				State state = p.state;
 				State nextState = new State(state.time + remainingTime, state.flowRate, p.flow(remainingTime));
 
 				nextPaths[i] = new Path(i, settings, nextState, p.currentValve, p.openedValves);
+			} else {
+				nextPaths[i] = paths[i];
 			}
 		}
 
@@ -80,12 +82,12 @@ class Paths {
 	}
 
 	public List<Route> get(Routes routes, Valve currentValve) {
+		List<Route> possibleNextRoutes = routes.get(currentValve.name);
 		List<Route> nextRoutes = new ArrayList<>();
-
-		for (Route r : routes)
-			if (r.from.name.equals(currentValve.name))
-				if (!isValveOpened(r.to))
-					nextRoutes.add(r);
+		
+		for (Route r : possibleNextRoutes)
+			if (!isValveOpened(r.to))
+				nextRoutes.add(r);
 
 		return nextRoutes;
 	}
@@ -182,51 +184,4 @@ class Paths {
 
 		return sb.toString();
 	}
-
-	public byte[] getBytes() {
-		return getString().getBytes();
-	}
-	
-	private static Valve getValve(String name, List<Valve> valves) {
-		for(Valve v : valves)
-			if(v.name.equals(name))
-				return v;
-		
-		return null;
-	}	
-	
-	public static Paths fromBytes(byte[] bytes, Settings settings, List<Valve> valves) {
-		return fromString(new String(bytes), settings, valves);
-	}
-	
-	public static Paths fromString(String str, Settings settings, List<Valve> valves) {
-		String[] splitPaths = str.split(";");
-		Path[] paths = new Path[splitPaths.length];
-
-		for (int i = 0; i < splitPaths.length; i++) {
-			String[] split = splitPaths[i].split(",");
-
-			String[] strState = split[0].split(":");
-
-			State state = new State(Integer.parseInt(strState[0]), Integer.parseInt(strState[1]),
-					Integer.parseInt(strState[2]));
-
-			Valve currentValve = getValve(split[1], valves);
-
-			Valve[] openedValves = new Valve[0];
-
-			if (split.length > 2) {
-				openedValves = new Valve[split.length - 2];
-
-				for (int j = 2; j < split.length; j++) {
-					openedValves[j - 2] = getValve(split[j], valves);
-				}
-			}
-
-			paths[i] = new Path(i, settings, state, currentValve, openedValves);
-		}
-
-		return new Paths(settings, paths);
-	}
-	
 }

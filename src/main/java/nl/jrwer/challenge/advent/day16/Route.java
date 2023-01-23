@@ -1,6 +1,6 @@
 package nl.jrwer.challenge.advent.day16;
 
-class Route {
+public class Route {
 	final Valve from;
 	final Valve to;
 	final int steps;

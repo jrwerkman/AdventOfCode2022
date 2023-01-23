@@ -1,26 +1,40 @@
 package nl.jrwer.challenge.advent.day16;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-class Routes implements Iterable<Route> {
+public class Routes {
 	final List<Valve> valves;
-	final List<Route> routes;
+	final Map<String, List<Route>> routes;
 	
 	public Routes(List<Valve> valves) {
 		this.valves = valves;
 		this.routes = init();
 	}
 	
-	private List<Route> init() {
-		List<Route> routes = new ArrayList<>();
+	private Map<String, List<Route>> init() {
+		Map<String, List<Route>> routes = new HashMap<>();
 		
 		for(int i=0; i<valves.size(); i++)
 			for(int j=0; j<valves.size(); j++)
-				if(i != j && valves.get(j).flowRate != 0)
-					routes.add(initRoute(valves.get(i), valves.get(j)));
+				if(i != j && valves.get(j).flowRate != 0) {
+					Valve from = valves.get(i);
+					Valve to = valves.get(j);
+					
+					Route r = initRoute(from, to); 
+					
+					if(routes.containsKey(from.name)) {
+						routes.get(from.name).add(r);
+					} else {
+						List<Route> list = new ArrayList<>();
+						list.add(r);
+						
+						routes.put(from.name, list);
+					}
+				}
 		
 		return routes;
 	}
@@ -41,7 +55,7 @@ class Routes implements Iterable<Route> {
 				int nextTime = r.steps + 1;
 				
 				for(String nextName : r.to.tunnelsLeadTo) {
-					Valve nextTo = get(nextName);
+					Valve nextTo = getValve(nextName);
 					
 					if(!visited.contains(nextTo)) {
 						visited.add(nextTo);
@@ -54,7 +68,7 @@ class Routes implements Iterable<Route> {
 		return null;
 	}
 	
-	private Valve get(String name) {
+	private Valve getValve(String name) {
 		for(Valve v : valves)
 			if(v.name.equals(name))
 				return v;
@@ -62,10 +76,9 @@ class Routes implements Iterable<Route> {
 		System.out.println("name not found: " + name);
 		return null;
 	}
-
-	@Override
-	public Iterator<Route> iterator() {
-		return routes.iterator();
+	
+	public List<Route> get(String nameFromValve) {
+		return this.routes.get(nameFromValve);
 	}
 	
 	public int size() {

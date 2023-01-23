@@ -3,12 +3,12 @@ package nl.jrwer.challenge.advent.day16;
 import java.util.LinkedList;
 import java.util.List;
 
-class Calculator {
-	final Settings settings;
-	final List<Valve> valves;
-	final Routes routes;
+public class Calculator {
+	protected final Settings settings;
+	protected final List<Valve> valves;
+	protected final Routes routes;
 	
-	final Valve startValve;
+	protected final Valve startValve;
 	
 	public Calculator(List<Valve> valves, Routes routes, Settings settings) {
 		this.settings = settings;

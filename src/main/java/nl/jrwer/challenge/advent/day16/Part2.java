@@ -15,10 +15,10 @@ class Part2  {
 	
 	public void start() {
 		execute(Part1.input[0], Part1.answers2[0]);
-//		execute(input[1], answers2[1]);
+//		execute(Part1.input[1], Part1.answers2[1]);
 
-//		for(int i=2; i<input.length; i++)
-//			execute(input[i], answers2[i]);
+//		for(int i=2; i<Part1.input.length; i++)
+//			execute(Part1.input[i], Part1.answers2[i]);
 	}
 	
 	public void execute(String input, int answer) {
@@ -28,12 +28,10 @@ class Part2  {
 		Routes routes = new Routes(valves);
 		Settings settings = new Settings(2, 26);
 		SecondCalculator c = new SecondCalculator(valves, routes, settings);
-		System.out.println("Run: " + input + ", Number of routes: " + routes.size());
-		int result = c.maxPresureReleaseFileQueue();
+		System.out.println("Run input: " + input);
+		int result = c.maxPresureRelease();
 		System.out.println("Max flown: " + result + " - Correct: " + (result == answer));
 		long end = System.currentTimeMillis();
-		
-		// TODO optimize and remove file queue!
 		
 		System.out.println("Process took: " + (end - start) + " ms\n");
 	}

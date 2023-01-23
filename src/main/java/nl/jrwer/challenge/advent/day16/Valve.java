@@ -1,10 +1,18 @@
 package nl.jrwer.challenge.advent.day16;
 
-class Valve {
+import java.util.Objects;
+
+public class Valve {
 	
-	String name;
-	int flowRate;
-	String[] tunnelsLeadTo;
+	final String name;
+	final int flowRate;
+	final String[] tunnelsLeadTo;
+	
+	public Valve(String name, int flowRate, String[] tunnelsLeadTo) {
+		this.name = name;
+		this.flowRate = flowRate;
+		this.tunnelsLeadTo = tunnelsLeadTo;
+	}
 	
 	@Override
 	public String toString() {
@@ -29,5 +37,10 @@ class Valve {
 			return name.equals(((Valve) obj).name);
 
 		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(name);
 	}
 }

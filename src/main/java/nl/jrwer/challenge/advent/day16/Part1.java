@@ -2,7 +2,7 @@ package nl.jrwer.challenge.advent.day16;
 
 import java.util.List;
 
-class Part1 {
+public class Part1 {
 	public static void main(String[] args) {
 		try {
 			Part1 day = new Part1();
@@ -26,8 +26,8 @@ class Part1 {
 	public static int[] answers2 = new int[] {2548, 1707, 2670, 12887, 1484, 3680};
 	
 	public void start() {
-//		execute(input[0], answers[0]);
-		execute(input[1], answers[1]);
+		execute(input[0], answers[0]);
+//		execute(input[1], answers[1]);
 
 //		for(int i=1; i<input.length; i++)
 //			execute(input[i], answers[i]);

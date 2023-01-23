@@ -2,7 +2,7 @@ package nl.jrwer.challenge.advent.day16;
 
 import nl.jrwer.challenge.advent.input.BasicInputLoader;
 
-class InputLoader extends BasicInputLoader<Valve>{
+public class InputLoader extends BasicInputLoader<Valve>{
 	
 	public static final String REGEX = "[^-0-9]+";
 	
@@ -12,10 +12,10 @@ class InputLoader extends BasicInputLoader<Valve>{
 
 	@Override
 	protected Valve handleLine(String line) {
-		Valve v = new Valve();
-		v.name = line.substring(6, 8);
-		v.flowRate = Integer.parseInt(line.replaceAll(REGEX, ""));
-		v.tunnelsLeadTo = tunnelsLeadTo(line);
+		Valve v = new Valve(
+				line.substring(6, 8),
+				Integer.parseInt(line.replaceAll(REGEX, "")),
+				tunnelsLeadTo(line));
 
 		return v;
 	}
